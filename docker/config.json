@@ -1,7 +1,8 @@
 {
-  "token_hmac_secret_key": "my_secret",
-  "api_key": "my_api_key",
+  "token_hmac_secret_key": "secret-key",
+  "api_key": "tommy",
   "admin_password": "password",
   "admin_secret": "secret",
+  "allowed_origins": ["*"],
   "admin": true
 }
