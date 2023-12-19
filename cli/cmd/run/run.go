@@ -1,24 +1,21 @@
 package run
 
 import (
+	"ayupov-ayaz/centrifugo/config"
 	"ayupov-ayaz/centrifugo/internal/client"
-	"ayupov-ayaz/centrifugo/internal/services/security"
 	"ayupov-ayaz/centrifugo/internal/subscription"
+	"fmt"
 	"time"
 )
 
 const host = "ws://localhost:8000/connection/websocket"
 
-func cfg() security.TokenGeneratorConfig {
-	return security.TokenGeneratorConfig{
-		AppKey:     "tommy",
-		Secret:     "secret-key",
-		Expiration: 1 * time.Hour,
-	}
-}
-
 func Run() error {
-	configs := cfg()
+	configs, err := config.New()
+	if err != nil {
+		return fmt.Errorf("config: %w", err)
+	}
+
 	cli, err := client.NewJsonClient(host, configs)
 	if err != nil {
 		return err

@@ -1,16 +1,17 @@
 package security
 
 import (
+	"ayupov-ayaz/centrifugo/config"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"log"
 	"time"
 )
 
-func GetTokenWithClaims(cfg TokenGeneratorConfig) func(claims map[string]interface{}) (string, error) {
+func GetTokenWithClaims(cfg *config.Config) func(claims map[string]interface{}) (string, error) {
 	return func(userClaims map[string]interface{}) (string, error) {
 		claims := jwt.MapClaims{
-			"sub": cfg.AppKey,
+			"sub": cfg.ApiKey,
 			"exp": time.Now().Add(cfg.Expiration).Unix(),
 		}
 
@@ -30,7 +31,7 @@ func GetTokenWithClaims(cfg TokenGeneratorConfig) func(claims map[string]interfa
 	}
 }
 
-func GetToken(cfg TokenGeneratorConfig) func() (string, error) {
+func GetToken(cfg *config.Config) func() (string, error) {
 	getToken := GetTokenWithClaims(cfg)
 
 	return func() (string, error) {

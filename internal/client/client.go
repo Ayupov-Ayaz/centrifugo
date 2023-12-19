@@ -1,6 +1,7 @@
 package client
 
 import (
+	"ayupov-ayaz/centrifugo/config"
 	"ayupov-ayaz/centrifugo/internal/services/security"
 	"crypto/tls"
 	"github.com/centrifugal/centrifuge-go"
@@ -8,13 +9,13 @@ import (
 	"time"
 )
 
-func defaultConfig(cfg security.TokenGeneratorConfig) (*centrifuge.Config, error) {
+func defaultConfig(cfg *config.Config) centrifuge.Config {
 	generateToken := security.GetToken(cfg)
 	getTokenFunc := func(_ centrifuge.ConnectionTokenEvent) (string, error) {
 		return generateToken()
 	}
 
-	resp := &centrifuge.Config{
+	return centrifuge.Config{
 		GetToken:           getTokenFunc,
 		Data:               nil,
 		CookieJar:          nil,
@@ -29,8 +30,6 @@ func defaultConfig(cfg security.TokenGeneratorConfig) (*centrifuge.Config, error
 		TLSConfig:          &tls.Config{},
 		EnableCompression:  false,
 	}
-
-	return resp, nil
 }
 
 func setHooks(cli *centrifuge.Client) {

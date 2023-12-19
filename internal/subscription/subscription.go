@@ -1,13 +1,14 @@
 package subscription
 
 import (
+	"ayupov-ayaz/centrifugo/config"
 	"ayupov-ayaz/centrifugo/internal/services/security"
 	"fmt"
 	"github.com/centrifugal/centrifuge-go"
 	"log"
 )
 
-func DefaultConfig(cfg security.TokenGeneratorConfig) (*centrifuge.SubscriptionConfig, error) {
+func DefaultConfig(cfg *config.Config) (*centrifuge.SubscriptionConfig, error) {
 	tokenGenerator := security.GetTokenWithClaims(cfg)
 
 	refreshToken := func(e centrifuge.SubscriptionTokenEvent) (string, error) {
@@ -62,7 +63,7 @@ func setHooks(sub *centrifuge.Subscription) {
 	})
 }
 
-func New(cli *centrifuge.Client, cfg security.TokenGeneratorConfig, channel string,
+func New(cli *centrifuge.Client, cfg *config.Config, channel string,
 ) (*centrifuge.Subscription, error) {
 	configs, err := DefaultConfig(cfg)
 	if err != nil {

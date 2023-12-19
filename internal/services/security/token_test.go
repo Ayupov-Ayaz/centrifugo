@@ -1,7 +1,6 @@
 package security
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -21,5 +20,4 @@ func Test_GetToken(t *testing.T) {
 	const expPrefix = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
 	require.Equal(t, expPrefix, token[:len(expPrefix)])
 	require.True(t, len(token) > len(expPrefix))
-	fmt.Println(token)
 }

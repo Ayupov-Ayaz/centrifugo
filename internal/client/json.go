@@ -1,19 +1,15 @@
 package client
 
 import (
-	"ayupov-ayaz/centrifugo/internal/services/security"
+	"ayupov-ayaz/centrifugo/config"
 	"fmt"
 	"github.com/centrifugal/centrifuge-go"
 )
 
 func NewJsonClient(
-	endpoint string, cfg security.TokenGeneratorConfig) (*centrifuge.Client, error) {
-	config, err := defaultConfig(cfg)
-	if err != nil {
-		return nil, err
-	}
+	endpoint string, cfg *config.Config) (*centrifuge.Client, error) {
+	cli := centrifuge.NewJsonClient(endpoint, defaultConfig(cfg))
 
-	cli := centrifuge.NewJsonClient(endpoint, *config)
 	setHooks(cli)
 
 	if err := cli.Connect(); err != nil {

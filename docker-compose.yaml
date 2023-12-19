@@ -4,7 +4,7 @@ services:
     container_name: centrifugo
     image: centrifugo/centrifugo:v5
     volumes:
-      - ./config.json:/centrifugo/config.json
+      - ./config/config.json:/centrifugo/config.json
     command: centrifugo -c config.json
     ports:
       - 8000:8000
