@@ -2,7 +2,6 @@ package security
 
 import (
 	"fmt"
-	"github.com/centrifugal/centrifuge-go"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -15,7 +14,7 @@ func Test_GetToken(t *testing.T) {
 		Expiration: 1 * time.Hour,
 	}
 
-	token, err := GetToken(cfg)(centrifuge.ConnectionTokenEvent{})
+	token, err := GetToken(cfg)()
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 

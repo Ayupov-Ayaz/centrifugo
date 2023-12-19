@@ -3,26 +3,24 @@ package client
 import (
 	"ayupov-ayaz/centrifugo/internal/services/security"
 	"crypto/tls"
-	"fmt"
 	"github.com/centrifugal/centrifuge-go"
+	"log"
 	"time"
 )
 
-type Config struct {
-	security.TokenGeneratorConfig
-	Version string
-}
+func defaultConfig(cfg security.TokenGeneratorConfig) (*centrifuge.Config, error) {
+	generateToken := security.GetToken(cfg)
+	getTokenFunc := func(_ centrifuge.ConnectionTokenEvent) (string, error) {
+		return generateToken()
+	}
 
-func DefaultConfig(cfg Config) centrifuge.Config {
-	getTokenFunc := security.GetToken(cfg.TokenGeneratorConfig)
-
-	return centrifuge.Config{
+	resp := &centrifuge.Config{
 		GetToken:           getTokenFunc,
 		Data:               nil,
 		CookieJar:          nil,
 		Header:             nil,
 		Name:               "app-go",
-		Version:            cfg.Version,
+		Version:            "v1.0.0",
 		NetDialContext:     nil,
 		ReadTimeout:        5 * time.Second,  // by default
 		WriteTimeout:       1 * time.Second,  // by default
@@ -31,26 +29,24 @@ func DefaultConfig(cfg Config) centrifuge.Config {
 		TLSConfig:          &tls.Config{},
 		EnableCompression:  false,
 	}
+
+	return resp, nil
 }
 
-func NewJsonClient(endpoint string, cfg centrifuge.Config) *centrifuge.Client {
-	client := centrifuge.NewJsonClient(endpoint, cfg)
-
-	client.OnConnecting(func(e centrifuge.ConnectingEvent) {
-		fmt.Printf("connecting: %d (%s)\n", e.Code, e.Reason)
+func setHooks(cli *centrifuge.Client) {
+	cli.OnConnecting(func(e centrifuge.ConnectingEvent) {
+		log.Printf("connecting: %d (%s)\n", e.Code, e.Reason)
 	})
 
-	client.OnConnected(func(e centrifuge.ConnectedEvent) {
-		fmt.Printf("connected - clientID=%s\n", e.ClientID)
+	cli.OnConnected(func(e centrifuge.ConnectedEvent) {
+		log.Printf("connected: clientID=%s, version=%s\n", e.ClientID, e.Version)
 	})
 
-	client.OnDisconnected(func(e centrifuge.DisconnectedEvent) {
-		fmt.Printf("disconnected: %d (%s) \n", e.Code, e.Reason)
+	cli.OnDisconnected(func(e centrifuge.DisconnectedEvent) {
+		log.Printf("disconnected: %d (%s) \n", e.Code, e.Reason)
 	})
 
-	client.OnError(func(e centrifuge.ErrorEvent) {
-		fmt.Printf("error: %s\n", e.Error.Error())
+	cli.OnError(func(e centrifuge.ErrorEvent) {
+		log.Printf("error: %s\n", e.Error.Error())
 	})
-
-	return client
 }

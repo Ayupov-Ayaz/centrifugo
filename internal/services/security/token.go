@@ -2,16 +2,20 @@ package security
 
 import (
 	"fmt"
-	"github.com/centrifugal/centrifuge-go"
 	"github.com/dgrijalva/jwt-go"
+	"log"
 	"time"
 )
 
-func GetToken(cfg TokenGeneratorConfig) func(_ centrifuge.ConnectionTokenEvent) (string, error) {
-	return func(_ centrifuge.ConnectionTokenEvent) (string, error) {
+func GetTokenWithClaims(cfg TokenGeneratorConfig) func(claims map[string]interface{}) (string, error) {
+	return func(userClaims map[string]interface{}) (string, error) {
 		claims := jwt.MapClaims{
 			"sub": cfg.AppKey,
 			"exp": time.Now().Add(cfg.Expiration).Unix(),
+		}
+
+		for k, v := range userClaims {
+			claims[k] = v
 		}
 
 		token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).
@@ -20,8 +24,16 @@ func GetToken(cfg TokenGeneratorConfig) func(_ centrifuge.ConnectionTokenEvent) 
 			return "", fmt.Errorf("error creating jwt token: %w", err)
 		}
 
-		fmt.Println("token: ", token)
+		log.Println("token: ", token)
 
 		return token, nil
+	}
+}
+
+func GetToken(cfg TokenGeneratorConfig) func() (string, error) {
+	getToken := GetTokenWithClaims(cfg)
+
+	return func() (string, error) {
+		return getToken(nil)
 	}
 }
